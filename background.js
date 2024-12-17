@@ -35,12 +35,18 @@ chrome.runtime.onInstalled.addListener(() => {
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId.startsWith("formatQuestion")) {
-    const formatIndex = info.menuItemId.replace("formatQuestion", "");
+    const formatIndex = parseInt(info.menuItemId.replace("formatQuestion", ""), 10); // Convert to integer
     const selectedText = info.selectionText;
-    const formattedQuestion = formattedQuestions[formatIndex].replace("%s", selectedText); // Use the stored format
 
-    const searchUrl = `https://www.perplexity.ai/?q=${encodeURIComponent(formattedQuestion)}`;
-    chrome.tabs.create({ url: searchUrl });
+    // Check if the formatIndex is valid
+    if (formattedQuestions[formatIndex]) {
+      const formattedQuestion = formattedQuestions[formatIndex].replace("%s", selectedText); // Use the stored format
+
+      const searchUrl = `https://www.perplexity.ai/?q=${encodeURIComponent(formattedQuestion)}`;
+      chrome.tabs.create({ url: searchUrl });
+    } else {
+      console.error(`Invalid format index: ${formatIndex}`); // Log an error for debugging
+    }
   } else if (info.menuItemId === "searchPerplexity") {
     const searchUrl = `https://www.perplexity.ai/?q=${encodeURIComponent(info.selectionText)}`;
     chrome.tabs.create({ url: searchUrl });
